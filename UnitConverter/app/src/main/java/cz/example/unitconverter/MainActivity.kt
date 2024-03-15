@@ -33,6 +33,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import cz.example.unitconverter.ui.theme.UnitConverterTheme
+import kotlin.math.roundToInt
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,7 +61,7 @@ fun unitConverter(){
         mutableStateOf("")
     }
     var inputUnit by remember {
-        mutableStateOf("Centimeters")
+        mutableStateOf("Meters")
     }
     var outputUnit by remember {
         mutableStateOf("Meters")
@@ -72,17 +73,31 @@ fun unitConverter(){
         mutableStateOf(false)
     }
     var conversionFactor = remember {
-        mutableStateOf(0.01)
+        mutableStateOf(1.00)
     }
+    var oConversionFactor = remember {
+        mutableStateOf(1.00)
+    }
+
+    fun convertUnits(){
+        // elvis operator -> some result or default will be 0.0
+        val inputValueDouble = inputValue.toDoubleOrNull() ?: 0.0
+        val result = (inputValueDouble * conversionFactor.value * 100 / oConversionFactor.value).roundToInt() / 100.0
+        outputUnit = result.toString()
+    }
+
 
     Column (
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ){
-        Text("Unit Converter")
+        Text("Unit Converter",
+            style = MaterialTheme.typography.headlineLarge)
         Spacer(modifier = Modifier.height(16.dp))
         OutlinedTextField(value = inputValue, onValueChange = {
+            inputValue = it
+            convertUnits()
         })
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -91,50 +106,96 @@ fun unitConverter(){
             Box{
                 // Input button
                 Button(onClick = { iExpanded = true}) {
-                    Text(text = "Select")
+                    Text(text = inputUnit)
                     Icon(Icons.Default.ArrowDropDown, "Arrow down")
                 }
                 DropdownMenu(expanded = iExpanded, onDismissRequest = { iExpanded = false }) {
                     DropdownMenuItem(
                         text = { Text("Centimeters") },
-                        onClick = { /*TODO*/ })
+                        onClick = {
+                            inputUnit = "Centimeters"
+                            iExpanded = false
+                            conversionFactor.value = 0.01
+                            convertUnits()
+                             })
                     DropdownMenuItem(
                         text = { Text("Meters") },
-                        onClick = { /*TODO*/ })
+                        onClick = {
+                            inputUnit = "Meters"
+                            iExpanded = false
+                            conversionFactor.value = 1.0
+                            convertUnits()
+                        })
                     DropdownMenuItem(
                         text = { Text("Decimeters") },
-                        onClick = { /*TODO*/ })
+                        onClick = {
+                            inputUnit = "Decimeters"
+                            iExpanded = false
+                            conversionFactor.value = 0.1
+                            convertUnits()
+                        })
                     DropdownMenuItem(
                         text = { Text("Milimeters") },
-                        onClick = { /*TODO*/ })
+                        onClick = {
+                            inputUnit = "Milimeters"
+                            iExpanded = false
+                            conversionFactor.value = 0.001
+                            convertUnits()
+                        })
                 }
             }
+
+
             Spacer(modifier = Modifier.width(16.dp))
+
+
             // Output box
             Box {
                 // Output button
                 Button(onClick = { oExpanded = true }) {
-                    Text(text = "Select")
+                    Text(text = outputUnit)
                     Icon(Icons.Default.ArrowDropDown, "Arrow down")
                 }
                 DropdownMenu(expanded = oExpanded, onDismissRequest = { oExpanded = false }) {
                     DropdownMenuItem(
                         text = { Text("Centimeters") },
-                        onClick = { /*TODO*/ })
+                        onClick = {
+                            inputUnit = "Centimeters"
+                            oExpanded = false
+                            oConversionFactor.value = 0.01
+                            convertUnits()
+                        })
                     DropdownMenuItem(
                         text = { Text("Meters") },
-                        onClick = { /*TODO*/ })
+                        onClick = {
+                            inputUnit = "Meters"
+                            oExpanded = false
+                            oConversionFactor.value = 1.00
+                            convertUnits()
+                        })
                     DropdownMenuItem(
                         text = { Text("Decimeters") },
-                        onClick = { /*TODO*/ })
+                        onClick = {
+                            inputUnit = "Decimeters"
+                            oExpanded = false
+                            oConversionFactor.value = 0.1
+                            convertUnits()
+                        })
                     DropdownMenuItem(
                         text = { Text("Milimeters") },
-                        onClick = { /*TODO*/ })
+                        onClick = { 
+                            inputUnit = "Milimeters"
+                            oExpanded = false
+                            oConversionFactor.value = 0.001
+                            convertUnits()
+                        })
                 }
             }
         }
         Spacer(modifier = Modifier.height(16.dp))
-        Text(text = "Result: $outputValue")
+        Text(text = "Result: $outputValue $outputUnit",
+            style = MaterialTheme.typography.headlineMedium
+            )
     }
 }
 
